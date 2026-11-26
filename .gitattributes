@@ -9,3 +9,10 @@
 /.github export-ignore
 CHANGELOG.md export-ignore
 .styleci.yml export-ignore
+
+# Laravel's generated skeleton is not authored code: keep it out of the language stats.
+config/*.php linguist-vendored
+config/growth.php -linguist-vendored
+public/index.php linguist-vendored
+bootstrap/providers.php linguist-vendored
+artisan linguist-vendored
