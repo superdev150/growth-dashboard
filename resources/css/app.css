@@ -1,0 +1,258 @@
+/*
+ * Tokens first: every color below is a role, defined once per theme. Chart series colors are a validated
+ * categorical pair (CVD-safe in both themes); dark mode uses its own steps, not an inversion.
+ */
+:root {
+  color-scheme: light;
+  --page: #f6f6f4;
+  --surface: #ffffff;
+  --ink: #191919;
+  --ink-2: #5f5f5f;
+  --hairline: #e7e7e7;
+  --baseline: #c2c2c2;
+  --border: rgba(11, 11, 11, 0.1);
+  --accent: #1b64be;
+  --good: #006c10;
+  --bad: #c22f30;
+  --warning-bg: #fff6e0;
+  --warning-ink: #6b4a00;
+  --series-1: #257de0;
+  --series-2: #f47230;
+  --series-3: #00b894;
+  --series-4: #f2a600;
+  --spark: #9a9a9a;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    color-scheme: dark;
+    --page: #0b0b0b;
+    --surface: #191919;
+    --ink: #efefef;
+    --ink-2: #a3a3a3;
+    --hairline: #303030;
+    --baseline: #474747;
+    --border: rgba(255, 255, 255, 0.1);
+    --accent: #6aabf1;
+    --good: #53c556;
+    --bad: #f07a7a;
+    --warning-bg: #2b2414;
+    --warning-ink: #f3d58b;
+    --series-1: #338ced;
+    --series-2: #e76624;
+    --series-3: #00a888;
+    --series-4: #d28e05;
+    --spark: #6f6f6f;
+  }
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --page: #0b0b0b;
+  --surface: #191919;
+  --ink: #efefef;
+  --ink-2: #a3a3a3;
+  --hairline: #303030;
+  --baseline: #474747;
+  --border: rgba(255, 255, 255, 0.1);
+  --accent: #6aabf1;
+  --good: #53c556;
+  --bad: #f07a7a;
+  --warning-bg: #2b2414;
+  --warning-ink: #f3d58b;
+  --series-1: #338ced;
+  --series-2: #e76624;
+  --series-3: #00a888;
+  --series-4: #d28e05;
+  --spark: #6f6f6f;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--page);
+  color: var(--ink);
+  font: 15px/1.45 system-ui, -apple-system, 'Segoe UI', sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1 { font-size: 1.6rem; margin: 0; letter-spacing: -0.01em; }
+h2 { font-size: 1rem; margin: 0; }
+h3 { margin: 0; }
+p { margin: 0; }
+
+.muted { color: var(--ink-2); }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+.page { max-width: 1200px; margin: 0 auto; padding: 24px 16px 48px; }
+
+.top { display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-end; justify-content: space-between; margin-bottom: 20px; }
+.controls { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+
+.badge {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 1px 8px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  font-size: 0.75rem;
+  color: var(--ink-2);
+  vertical-align: 1px;
+}
+
+button { font: inherit; color: inherit; cursor: pointer; }
+button:focus-visible, svg:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+button:disabled { opacity: 0.55; cursor: default; }
+
+.ghost {
+  min-height: 36px;
+  padding: 6px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+}
+.ghost:hover:not(:disabled) { border-color: var(--baseline); }
+.link { border: 0; background: none; padding: 0; color: var(--accent); text-decoration: underline; }
+
+.segmented {
+  display: inline-flex;
+  padding: 3px;
+  border-radius: 10px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+}
+.segmented button {
+  min-height: 30px;
+  padding: 4px 12px;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--ink-2);
+}
+.segmented button[aria-checked='true'] { background: var(--ink); color: var(--surface); }
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 16px;
+}
+
+/* minmax(0, 1fr): the column follows the page, never the content (a chart must not widen what it measures). */
+main { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; transition: opacity 0.15s; }
+main.stale { opacity: 0.6; }
+
+.notice {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  padding: 12px 16px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  margin-bottom: 16px;
+}
+main .notice { margin-bottom: 0; }
+.notice.warning { background: var(--warning-bg); color: var(--warning-ink); }
+.notice ul { margin: 4px 0 0; padding-left: 18px; }
+.notice-icon {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 2px solid currentColor;
+  font-weight: 700;
+  font-size: 0.8rem;
+}
+
+/* Key figures */
+.tiles { display: grid; gap: 12px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.tile { display: grid; gap: 4px; align-content: start; min-width: 0; }
+.tile.hero { grid-column: span 2; grid-template-rows: auto auto auto 1fr; }
+.tile.hero .sparkline { height: 100%; min-height: 64px; margin-top: 16px; }
+@media (min-width: 900px) {
+  /* The headline figure takes a 2×2 block; the four supporting figures sit beside it. */
+  .tiles { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .tile.hero { grid-row: span 2; }
+}
+.tile-label { font-size: 0.85rem; font-weight: 500; color: var(--ink-2); }
+.tile-value { font-size: 1.7rem; font-weight: 600; letter-spacing: -0.01em; }
+.tile.hero .tile-value { font-size: 3rem; line-height: 1.1; }
+.delta { font-size: 0.85rem; }
+.delta.good { color: var(--good); }
+.delta.bad { color: var(--bad); }
+.delta .muted { color: var(--ink-2); }
+.sparkline { position: relative; height: 28px; margin: 6px 5px 0 0; }
+/* Absolutely placed: the box decides the size, never the SVG (a viewBox alone would make it square). */
+.sparkline svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.sparkline polyline { fill: none; stroke: var(--spark); stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; vector-effect: non-scaling-stroke; }
+.spark-dot {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  margin: -5px 0 0 -5px;
+  border-radius: 50%;
+  background: var(--series-1);
+  box-shadow: 0 0 0 2px var(--surface);
+}
+
+/* Charts */
+.charts { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 460px), 1fr)); }
+.chart { display: grid; gap: 10px; min-width: 0; }
+.chart-head { display: flex; justify-content: space-between; gap: 12px; align-items: flex-start; }
+.chart-head p { font-size: 0.85rem; }
+
+.legend { display: flex; flex-wrap: wrap; gap: 4px 16px; margin: 0; padding: 0; list-style: none; font-size: 0.85rem; color: var(--ink-2); }
+.legend li { display: inline-flex; align-items: center; gap: 6px; }
+.swatch { display: inline-block; flex: none; width: 10px; height: 10px; border-radius: 3px; margin-right: 6px; vertical-align: -1px; }
+.legend .swatch { margin-right: 0; }
+
+.plot { position: relative; min-width: 0; width: 100%; overflow: hidden; }
+.plot svg { display: block; max-width: 100%; }
+.plot .grid { stroke: var(--hairline); stroke-width: 1; shape-rendering: crispEdges; }
+.plot .baseline { stroke: var(--baseline); stroke-width: 1; shape-rendering: crispEdges; }
+.plot .tick { fill: var(--ink-2); font-size: 11px; font-variant-numeric: tabular-nums; }
+.plot .hit { fill: transparent; }
+.plot .incomplete path { opacity: 0.45; }
+
+.tooltip {
+  position: absolute;
+  top: 0;
+  transform: translateX(-50%);
+  min-width: 200px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.12);
+  font-size: 0.85rem;
+  pointer-events: none;
+  display: grid;
+  gap: 4px;
+}
+.tooltip-row { display: grid; grid-template-columns: 12px 1fr auto; gap: 8px; align-items: center; white-space: nowrap; }
+.tooltip-row .swatch { margin: 0; }
+.tooltip-row.total { border-top: 1px solid var(--hairline); padding-top: 4px; font-weight: 600; }
+
+/* Tables */
+.table-scroll { overflow-x: auto; margin-top: 8px; }
+table.data { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+table.data th, table.data td { padding: 8px 10px; text-align: left; border-bottom: 1px solid var(--hairline); white-space: nowrap; }
+table.data thead th { font-weight: 500; color: var(--ink-2); font-size: 0.8rem; }
+table.data tbody th { font-weight: 500; }
+table.data .num { text-align: right; font-variant-numeric: tabular-nums; }
+table.data tr:last-child > * { border-bottom: 0; }
+.footnote { font-size: 0.8rem; margin-top: 8px; }
+
+@media (max-width: 560px) {
+  .tile-value { font-size: 1.35rem; }
+  .tile.hero .tile-value { font-size: 2.4rem; }
+  .card { padding: 14px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  main { transition: none; }
+}
